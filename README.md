@@ -41,9 +41,16 @@ poetry install
 ```
 
 ### Environment Setup
+1. Frontend Configuration
 Create `.env` in the frontend directory:
 ```
 VITE_BACKEND_URL=http://localhost:8000
+```
+
+2. Backend Configuration
+Create `.env` in the backend directory (see `.env.example` for template):
+```
+NVIDIA_API_KEY=your-nvidia-api-key-here
 ```
 
 ### Running the Application

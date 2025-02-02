@@ -4,7 +4,10 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 import logging
 import traceback
 import sys
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -19,9 +22,13 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+api_key = os.getenv('NVIDIA_API_KEY')
+if not api_key:
+    raise ValueError("NVIDIA_API_KEY environment variable is required")
+
 client = ChatNVIDIA(
     model="deepseek-ai/deepseek-r1",
-    api_key="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",
+    api_key=api_key,
     temperature=0.6,
     top_p=0.7,
     max_tokens=4096,
