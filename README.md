@@ -7,6 +7,10 @@ An intelligent chat interface powered by NVIDIA AI, featuring real-time response
 - Powered by NVIDIA AI DeepSeek-R1 model
 - Modern UI with NVIDIA branding (#76B900)
 - WebSocket-based communication for instant responses
+- Connection status monitoring
+- Elegant loading states and animations
+- Responsive design for all devices
+- User and AI message distinction with icons
 
 ## Technology Stack
 - Frontend: React + TypeScript with Tailwind CSS
@@ -14,24 +18,82 @@ An intelligent chat interface powered by NVIDIA AI, featuring real-time response
 - AI: NVIDIA AI Endpoints with DeepSeek-R1 model
 
 ## Development
+
+### Prerequisites
+- Node.js 18+
+- Python 3.12+
+- Poetry
+- NVIDIA AI API key
+
+### Installation
 ```bash
-# Install dependencies
-cd frontend && npm install
-cd ../backend && poetry install
+# Clone the repository
+git clone https://github.com/leeakpareva/nvidia.redAi.git
+cd nvidia.redAi
 
-# Run frontend
-cd frontend && npm run dev
+# Install frontend dependencies
+cd frontend
+npm install
 
-# Run backend
-cd backend && poetry run uvicorn app.main:app --reload
+# Install backend dependencies
+cd ../backend
+poetry install
 ```
 
+### Environment Setup
+1. Frontend Configuration
+Create `.env` in the frontend directory:
+```
+VITE_BACKEND_URL=http://localhost:8000
+```
+
+2. Backend Configuration
+Create `.env` in the backend directory (see `.env.example` for template):
+```
+NVIDIA_API_KEY=your-nvidia-api-key-here
+```
+
+### Running the Application
+```bash
+# Start the backend
+cd backend
+poetry run uvicorn app.main:app --reload
+
+# In a new terminal, start the frontend
+cd frontend
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
 ## Testing
-Before submitting changes:
-1. Verify chat functionality works
-2. Test WebSocket connection
-3. Check UI responsiveness
-4. Ensure NVIDIA branding appears correctly
+
+### Frontend Testing
+1. Verify chat functionality:
+   - Test message sending and receiving
+   - Check real-time streaming responses
+   - Verify message history display
+
+2. UI Components:
+   - Ensure NVIDIA branding appears correctly
+   - Verify loading animations
+   - Check connection status indicator
+   - Test responsive design on different screen sizes
+
+3. WebSocket Connection:
+   - Verify connection establishment
+   - Test reconnection handling
+   - Check error states
+
+### Backend Testing
+1. API Endpoints:
+   - Test WebSocket endpoint
+   - Verify NVIDIA AI integration
+   - Check error handling
+
+2. Performance:
+   - Test concurrent connections
+   - Verify message streaming performance
 
 ## Contributing
 1. Create a new branch

@@ -1,6 +1,15 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
+import logging
+import traceback
+import sys
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -13,9 +22,13 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+api_key = os.getenv('NVIDIA_API_KEY')
+if not api_key:
+    raise ValueError("NVIDIA_API_KEY environment variable is required")
+
 client = ChatNVIDIA(
     model="deepseek-ai/deepseek-r1",
-    api_key="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",
+    api_key=api_key,
     temperature=0.6,
     top_p=0.7,
     max_tokens=4096,
@@ -27,12 +40,17 @@ async def chat_endpoint(websocket: WebSocket):
     try:
         while True:
             message = await websocket.receive_text()
-            print(f"Received message: {message}")
+            logger.info(f"Received message: {message}")
             try:
                 messages = [{"role": "user", "content": message}]
-                print(f"Sending request to NVIDIA AI with messages: {messages}")
-                response_stream = client.stream(messages)
-                print("Got response stream")
+                logger.info(f"Sending request to NVIDIA AI with messages: {messages}")
+                try:
+                    response_stream = client.stream(messages)
+                    logger.info("Got response stream")
+                except Exception as api_error:
+                    logger.error(f"NVIDIA AI API Error: {str(api_error)}")
+                    logger.error(f"API Error Traceback: {traceback.format_exc()}")
+                    await websocket.send_text("Error connecting to NVIDIA AI. Please try again.")
                 
                 response_text = ""
                 for chunk in response_stream:
@@ -49,7 +67,10 @@ async def chat_endpoint(websocket: WebSocket):
                     await websocket.send_text("Sorry, I couldn't generate a response. Please try again.")
                     
             except Exception as e:
-                print(f"Error in stream: {str(e)}")
+                error_msg = f"Error in stream: {str(e)}"
+                print(error_msg)
+                import traceback
+                print(f"Traceback: {traceback.format_exc()}")
                 await websocket.send_text("Sorry, there was an error processing your request. Please try again.")
                 
     except Exception as e:
